@@ -1,0 +1,29 @@
+version: '3.10'
+services:
+  django:
+    build: .
+    expose:
+      - 8000
+    env_file:
+      - .env
+    restart: always
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=False
+    volumes:
+      - static_volume:/usr/src/code/static_nginx
+      - media_volume:/usr/src/code/media
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    depends_on:
+      - django
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/usr/src/code/static_nginx
+      - media_volume:/usr/src/code/media
+    ports:
+      - 80:80
+volumes:
+  static_volume:
+  media_volume:
